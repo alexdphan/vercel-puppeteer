@@ -1,4 +1,3 @@
-import Image from "next/image";
 import UrlExporter from './components/UrlExporter';
 
 export default function Home() {
