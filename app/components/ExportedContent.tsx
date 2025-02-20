@@ -42,7 +42,7 @@ const ExportedContent: React.FC<ExportedContentProps> = ({
         <div className="mt-8">
           <a
             href={`/api/screenshot?url=${encodeURIComponent(content)}`}
-            download="export.jpeg"
+            download="export.png"
             className="w-full py-4 px-6 flex items-center justify-center bg-foreground text-background hover:bg-foreground/90 transition-colors rounded-lg"
           >
             Download Screenshot
