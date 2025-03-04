@@ -3,10 +3,10 @@ import Browserbase from "@browserbasehq/sdk";
 import { Stagehand, ObserveResult, LogLine } from "@browserbasehq/stagehand";
 
 // API route handler for GET requests
-export async function GET(req: Request) {
+export async function GET() {
   try {
-    // const url = new URL(req.url).searchParams.get("url");
     const url = "https://file.1040.com/estimate/";
+    
     if (!url) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
     }
