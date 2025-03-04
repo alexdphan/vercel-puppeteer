@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import Browserbase from "@browserbasehq/sdk";
 import { Stagehand, ObserveResult, LogLine } from "@browserbasehq/stagehand";
-import puppeteer from "puppeteer-core";
 
 // API route handler for GET requests
 export async function GET(req: Request) {
@@ -21,11 +20,6 @@ export async function GET(req: Request) {
       browserSettings: {
         viewport: { width: 1920, height: 1080 },
       },
-    });
-
-    // Connect using puppeteer with the session's connectUrl
-    const browser = await puppeteer.connect({
-      browserWSEndpoint: session.connectUrl,
     });
 
     // Initialize Stagehand
@@ -105,28 +99,26 @@ export async function GET(req: Request) {
       }
       return candidate;
     });
- 
+
     // Fill all the form fields with the mapped candidates
     for (const candidate of updatedFields) {
       await stagehand.page.act(candidate);
     }
 
-    // Close the browser
-    await browser.close();
-
     // Return the results
     console.log(updatedFields);
+
+    // Close the browser
+    await stagehand.close();
+
+    // Return the url and the fields that were filled
     return NextResponse.json({
-      success: true,
-      formData: {
-        url: url,
-        filledFields: updatedFields.map(field => ({
-          fieldName: field.description,
-          value: field.arguments?.[0] || "no value",
-          selector: field.selector || "unknown"
-        })),
-        totalFieldsFilled: updatedFields.length
-      }
+      url: url,
+      fields: updatedFields.map((field) => ({
+        name: field.description,
+        value: field.arguments?.[0] || null,
+      })),
+      count: updatedFields.length,
     });
   } catch (error) {
     // Log the error to console

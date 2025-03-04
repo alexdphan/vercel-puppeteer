@@ -5,11 +5,11 @@ import ExportedContent from "./ExportedContent";
 import FormatToggle from "./FormatToggle";
 import ExistingUrl from './ExistingUrl';
 
-export type ExportFormat = "markdown" | "html" | "screenshot";
+export type ExportFormat = "html" | "screenshot";
 
 const UrlExporter = () => {
   const [url, setUrl] = useState("");
-  const [format, setFormat] = useState<ExportFormat>("markdown");
+  const [format, setFormat] = useState<ExportFormat>("html");
   const [exportedContent, setExportedContent] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
@@ -36,7 +36,7 @@ const UrlExporter = () => {
         setExportedContent(url);
       } else {
         const data = await response.json();
-        setExportedContent(format === "html" ? data.html : data.markdown);
+        setExportedContent(data.html);
       }
     } catch (error) {
       alert((error as Error).message || "Failed to export content");

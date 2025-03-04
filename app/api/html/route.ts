@@ -1,55 +1,55 @@
 import { NextResponse } from "next/server";
+import Browserbase from "@browserbasehq/sdk";
 import puppeteer from "puppeteer-core";
 import prettier from "prettier";
 import htmlParser from "prettier/parser-html";
 
-// API route handler for GET requests
 export async function GET(req: Request) {
   try {
+    // Extract URL from request query parameters
     const url = new URL(req.url).searchParams.get("url");
+
     if (!url) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
     }
-    // creating and connecting to a browser session using Browserbase
-    const browser = await puppeteer.connect({
-      browserWSEndpoint: `wss://connect.browserbase.com?apiKey=${process.env.BROWSERBASE_API_KEY}`,
+
+    // Initialize Browserbase with API key
+    const bb = new Browserbase({ apiKey: process.env.BROWSERBASE_API_KEY! });
+
+    // Create a new browser session with specified viewport
+    const session = await bb.sessions.create({
+      projectId: process.env.BROWSERBASE_PROJECT_ID!,
+      browserSettings: {
+        viewport: { width: 1920, height: 1080 },
+      },
     });
 
-    // Create a new page/tab in the browser
+    // Connect to browser instance using Puppeteer
+    const browser = await puppeteer.connect({
+      browserWSEndpoint: session.connectUrl,
+    });
+
+    // Navigate to URL and capture HTML
     const page = await browser.newPage();
-
-    // Navigate to URL and wait until network is idle (no requests for 500ms)
-    await page.goto(url, {waitUntil: "domcontentloaded"})
-
-    // Get the entire HTML content of the page by evaluating JS in the browser context
+    await page.goto(url, { waitUntil: "domcontentloaded" });
     const html = await page.evaluate(
       () => document.querySelector("*")?.outerHTML
     );
 
-    // Format the HTML string using prettier with HTML parser plugin
     const formattedHtml = await prettier.format(html || "", {
       parser: "html",
       plugins: [htmlParser],
     });
 
-    // Close the page/tab
-    await page.close();
-
-    // Close the browser completely
     await browser.close();
 
-    // respond with json, in the formatted HTML format
     return NextResponse.json({ html: formattedHtml });
   } catch (error) {
-    // Log the error to console
-    console.error("Scraping error:", error);
-
-    // Return error response with message and error details
+    console.error("HTML generation error:", error);
     return NextResponse.json(
       {
-        message: "Failed to scrape content",
-        // If error is Error instance, use its message, otherwise use generic message
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: "Failed to generate HTML",
+        details: error instanceof Error ? error.message : String(error),
       },
       { status: 500 }
     );

@@ -3,7 +3,7 @@ import Image from "next/image";
 
 interface ExportedContentProps {
   content: string;
-  format?: "markdown" | "html" | "screenshot";
+  format?: "html" | "screenshot";
   loading?: boolean;
 }
 
@@ -81,7 +81,7 @@ const ExportedContent: React.FC<ExportedContentProps> = ({
       >
         <div className="relative">
           <pre className="p-4 rounded-lg bg-black/[.03] dark:bg-white/[.03] font-mono text-sm overflow-x-auto">
-            <code>{format === "markdown" ? content : content}</code>
+            <code>{content}</code>
           </pre>
           <button
             onClick={handleCopy}

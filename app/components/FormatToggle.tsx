@@ -6,7 +6,7 @@ interface FormatToggleProps {
 }
 
 const FormatToggle: React.FC<FormatToggleProps> = ({ value, onChange }) => {
-  const formats: ExportFormat[] = ["markdown", "html", "screenshot"];
+  const formats: ExportFormat[] = ["html", "screenshot"];
 
   return (
     <div className="flex w-full sm:w-auto border border-black/[.08] h-10">
