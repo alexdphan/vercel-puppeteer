@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     const page = await browser.newPage();
 
     // Navigate to URL and wait until network is idle (no requests for 500ms)
-    await page.goto(url, { waitUntil: "networkidle0" });
+    await page.goto(url, {waitUntil: "domcontentloaded"})
 
     // Get the entire HTML content of the page by evaluating JS in the browser context
     const html = await page.evaluate(
